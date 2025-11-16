@@ -31,9 +31,31 @@ from dotenv import load_dotenv
 # .env faylidan konfiguratsiyani yuklash
 load_dotenv()
 
-# Bot konfiguratsiyasi
-TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8414688777:AAHcL-ftq3knbQgek8VOtaKQE_PLFAS1sEo")
+TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 ADMIN_ID = int(os.getenv("TELEGRAM_ADMIN_ID", "6607605946"))
+
+# Web server port
+PORT = int(os.getenv("PORT", 10000))
+
+async def main():
+    # Log sozlamalari
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+    
+    # Botni yaratish
+    bot = Bot(token=TOKEN)
+    dp = Dispatcher()
+    
+    try:
+        logging.info("Bot starting...")
+        await dp.start_polling(bot)
+    except Exception as e:
+        logging.error(f"Bot error: {e}")
+    finally:
+        await bot.session.close()
+
 
 # Botni ishga tushirish (Global obyekt)
 bot = Bot(token=TOKEN)
