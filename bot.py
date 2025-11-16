@@ -30,12 +30,38 @@ from dotenv import load_dotenv
 
 # .env faylidan konfiguratsiyani yuklash
 load_dotenv()
-
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 ADMIN_ID = int(os.getenv("TELEGRAM_ADMIN_ID", "6607605946"))
-
-# Web server port
 PORT = int(os.getenv("PORT", 10000))
+
+# Token tekshiruvi
+if not TOKEN:
+    print("❌ TELEGRAM_BOT_TOKEN topilmadi!")
+    exit(1)
+
+print(f"✅ Token: {TOKEN[:10]}...")
+print(f"✅ Admin: {ADMIN_ID}")
+print(f"✅ Port: {PORT}")
+
+# Bot va Dispatcher
+bot = Bot(token=TOKEN)
+dp = Dispatcher()
+
+# ==================== WEB SERVER ====================
+async def handle_health_check(request):
+    return web.Response(text="🤖 Bot is running perfectly!")
+
+async def start_web_server():
+    app = web.Application()
+    app.router.add_get('/', handle_health_check)
+    app.router.add_get('/health', handle_health_check)
+    
+    runner = web.AppRunner(app)
+    await runner.setup()
+    
+    site = web.TCPSite(runner, host='0.0.0.0', port=PORT)
+    await site.start()
+    print(f"🌐 Web server started on port {PORT}")
 
 async def main():
     # Log sozlamalari
